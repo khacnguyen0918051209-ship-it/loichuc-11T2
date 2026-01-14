@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Lời chúc</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <style>
 html, body {
@@ -14,45 +14,19 @@ html, body {
   overflow: hidden;
   font-family: Arial, sans-serif;
 }
-#overlay {
+
+#bg {
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle, #111, #000);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 20;
+  z-index: 0;
+  pointer-events: none;
 }
 
-#card {
-  background: rgba(0,0,0,0.6);
-  padding: 40px 50px;
-  border-radius: 20px;
-  text-align: center;
-  box-shadow: 0 0 40px #ff4d94;
-}
-
-#card h1 {
-  color: #ff6fae;
-  margin-bottom: 10px;
-}
-
-#card p {
-  color: #aaa;
-  margin-bottom: 25px;
-}
-
-#stt {
-  padding: 16px 26px;
-  font-size: 20px;
-  border-radius: 14px;
-  border: none;
-  outline: none;
-}
 #scene {
-  width: 100%;
-  height: 100%;
-  perspective: 1600px;
+  position: fixed;
+  inset: 0;
+  perspective: 1200px;
+  z-index: 1;
 }
 
 #world {
@@ -62,105 +36,90 @@ html, body {
   transform-style: preserve-3d;
   transform: translate(-50%, -50%);
 }
+
 .text {
   position: absolute;
   color: #ff6fae;
-  font-size: 18px;
-  text-shadow: 0 0 14px #ff4d94;
+  text-shadow: 0 0 12px #ff4d94;
   white-space: nowrap;
   animation: float linear infinite;
 }
 
 @keyframes float {
-  from {
-    transform: translate3d(var(--x), var(--y), var(--z));
-    opacity: 0;
-  }
-  to {
-    transform: translate3d(var(--x), calc(var(--y) - 420px), var(--z));
-    opacity: 1;
-  }
+  from { transform: translate3d(var(--x), var(--y), var(--z)); opacity: 0; }
+  to   { transform: translate3d(var(--x), calc(var(--y) - 420px), var(--z)); opacity: 1; }
 }
+
 .heart {
   position: absolute;
-  color: #ff4d94;
-  font-size: 14px;
+  color: rgba(255, 77, 148, 0.25);
   animation: heart linear infinite;
 }
 
 @keyframes heart {
-  from {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateY(-480px);
-    opacity: 0;
-  }
+  from { transform: translateY(0); opacity: 0; }
+  to   { transform: translateY(-600px); opacity: 1; }
 }
 </style>
 </head>
 
 <body>
-<div id="overlay">
-  <div id="card">
-    <h1>💗 Nhập số thứ tự</h1>
-    <p>Từ 1 đến 35 để xem lời chúc dành riêng cho bạn</p>
-    <input id="stt" type="number" min="1" max="35" placeholder="STT của bạn">
-  </div>
-</div>
+
+<div id="bg"></div>
+
 <div id="scene">
   <div id="world"></div>
 </div>
 
 <script>
-const wishes = {};
-for (let i = 1; i <= 35; i++) wishes[i] = "STT: " + i;
+const wishes = [
+  "Chúc tập thể T2K16 luôn đạt được những điều mong muốn",
+  "Ngày càng xinh trai,đẹp gái",
+  "Luôn hạnh phúc trên con đường đã chọn",
+  "Chúc T2K16 một năm mới bình an",
+  "Đầm ấm bên gia đình",
+];
 
 const world = document.getElementById("world");
-const overlay = document.getElementById("overlay");
-const input = document.getElementById("stt");
+const bg = document.getElementById("bg");
 
-input.addEventListener("change", () => {
-  const v = input.value;
-  if (!wishes[v]) return;
-  overlay.style.display = "none";
-  startEffect(wishes[v]);
-});
-function startEffect(text) {
- setInterval(() => {
+function textSize() {
+  return Math.max(14, Math.min(22, window.innerWidth / 20)) + "px";
+}
+
+setInterval(() => {
   const el = document.createElement("div");
   el.className = "text";
-  el.innerText = text;
+  el.innerText = wishes[Math.floor(Math.random() * wishes.length)];
+  el.style.fontSize = textSize();
 
-  const radius = 650;
+  const radius = window.innerWidth / 2 + 120;
   const angle = Math.random() * Math.PI * 2;
-
-  const x = Math.cos(angle) * (Math.random() * radius);
-  const y = (Math.random() - 0.5) * 360;
-  const z = (Math.random() - 0.5) * 900;
+  const x = Math.cos(angle) * Math.random() * radius;
+  const y = (Math.random() - 0.5) * window.innerHeight;
+  const z = (Math.random() - 0.5) * 700;
 
   el.style.setProperty("--x", x + "px");
   el.style.setProperty("--y", y + "px");
   el.style.setProperty("--z", z + "px");
-  el.style.animationDuration = (10 + Math.random() * 8) + "s";
+  el.style.animationDuration = (8 + Math.random() * 6) + "s";
 
   world.appendChild(el);
   setTimeout(() => el.remove(), 20000);
 }, 300);
 
-  // tim
-  setInterval(() => {
-    const h = document.createElement("div");
-    h.className = "heart";
-    h.innerText = "💗";
-    h.style.left = Math.random() * window.innerWidth + "px";
-    h.style.bottom = "0px";
-    h.style.animationDuration = (5 + Math.random() * 5) + "s";
-    document.body.appendChild(h);
-    setTimeout(() => h.remove(), 9000);
-  }, 120);
-}
+setInterval(() => {
+  const h = document.createElement("div");
+  h.className = "heart";
+  h.innerText = "💗";
+  h.style.fontSize = (12 + Math.random() * 18) + "px";
+  h.style.left = Math.random() * window.innerWidth + "px";
+  h.style.bottom = "-40px";
+h.style.animationDuration = (8 + Math.random() * 8) + "s";
+  bg.appendChild(h);
+  setTimeout(() => h.remove(), 16000);
+}, 400);
+
 let rx = 0, ry = 0, drag = false, lx = 0, ly = 0;
 
 function update() {
@@ -174,28 +133,24 @@ document.addEventListener("mousedown", e => {
 document.addEventListener("mouseup", () => drag = false);
 document.addEventListener("mousemove", e => {
   if (!drag) return;
-  ry += (e.clientX - lx) * 0.15;
-  rx -= (e.clientY - ly) * 0.15;
+  ry += (e.clientX - lx) * 0.12;
+  rx -= (e.clientY - ly) * 0.12;
   lx = e.clientX; ly = e.clientY;
   update();
 });
 
 document.addEventListener("touchstart", e => {
-  drag = true;
-  lx = e.touches[0].clientX;
-  ly = e.touches[0].clientY;
+  drag = true; lx = e.touches[0].clientX; ly = e.touches[0].clientY;
 });
 document.addEventListener("touchend", () => drag = false);
 document.addEventListener("touchmove", e => {
   if (!drag) return;
-  ry += (e.touches[0].clientX - lx) * 0.15;
-  rx -= (e.touches[0].clientY - ly) * 0.15;
-  lx = e.touches[0].clientX;
-  ly = e.touches[0].clientY;
+  ry += (e.touches[0].clientX - lx) * 0.12;
+  rx -= (e.touches[0].clientY - ly) * 0.12;
+  lx = e.touches[0].clientX; ly = e.touches[0].clientY;
   update();
 });
 </script>
 
 </body>
 </html>
-
